@@ -1,0 +1,29 @@
+{
+  "imap_server": "mail.chnenergy.com.cn",
+  "imap_port": 993,
+  "mailbox": "INBOX",
+  "sender_domain": "argusalerts.com",
+  "handover_date": "2026-09-07",
+  "publications": [
+    {
+      "code": "cdi",
+      "subject_contains": "Argus Coal Daily International",
+      "attachment_regex": "^\\d{8}cdi\\.pdf$",
+      "download_folder": "/Users/yourname/ArgusPublications/Coal Daily International"
+    },
+    {
+      "code": "mck",
+      "subject_contains": "",
+      "attachment_regex": "^\\d{8}mck\\.pdf$",
+      "download_folder": "/Users/yourname/ArgusPublications/McCloskey Coal Price Index"
+    },
+    {
+      "code": "ici",
+      "subject_contains": "",
+      "attachment_regex": "^\\d{8}ici\\.pdf$",
+      "download_folder": "/Users/yourname/ArgusPublications/Indonesian Coal Index"
+    }
+  ],
+  "lookback_days_first_run": 30,
+  "lookback_days_normal": 10
+}

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Argus 价格台</title>
+<style>
+:root{--bg:#f2e9d8;--bg2:#efe2c9;--card:#fbf5e8;--card2:#f6eeda;--line:#cfbf9d;--rowline:#e5d8bd;--text:#463525;--muted:#8a7355;--accent:#d05a26;--good:#2e9e5b;--bad:#d64541;--btn2:#c2ad85;--inputbg:#fffaf0;--tabbg:#efe4cd;--canvasbg:#f6eeda;--grid:#e2d3b2;--axis:#8a7355;--tooltipbg:#fdf8ec;--tooltipborder:#c9b287;--tipdate:#a05a2a;--tooltip-line:rgba(150,115,60,.35);--tooltiptext:#5a4630;--tooltip-strong:#2f2113;--storyhead:#2f2113;--storysub:#8a7355;--storybody:#43311f;--storyen:#7a674f;--noticebg:#f7e9d4;--noticeborder:#d9b98a;--link:#c04f1f}
+[data-theme="green"]{--bg:#e4efdc;--bg2:#dcead2;--card:#f3f9ee;--card2:#eef6e8;--line:#bcd3ac;--rowline:#d8e6cb;--text:#2f4a2b;--muted:#6f8f66;--accent:#3d8b3f;--good:#2e9e5b;--bad:#d64541;--btn2:#86a97a;--inputbg:#fbfef7;--tabbg:#dcead2;--canvasbg:#eef6e8;--grid:#d2e3c4;--axis:#6f8f66;--tooltipbg:#f7fcf2;--tooltipborder:#b4cd9f;--tipdate:#2f7a31;--tooltip-line:rgba(90,130,70,.35);--tooltiptext:#33502e;--tooltip-strong:#1c3118;--storyhead:#1c3118;--storysub:#6f8f66;--storybody:#2c4626;--storyen:#5d7a55;--noticebg:#eef6e4;--noticeborder:#b8d3a0;--link:#2f7a31}
+[data-theme="dark"]{--bg:#0e1b2e;--bg2:#0b1524;--card:#16283f;--card2:#0b1524;--line:#2d4563;--rowline:#1e3149;--text:#e8eef5;--muted:#9fb2c8;--accent:#e05b2c;--good:#2ecc71;--bad:#ff6b5e;--btn2:#24405f;--inputbg:#0e1b2e;--tabbg:#0b1524;--canvasbg:#0b1524;--grid:#22364f;--axis:#9fb2c8;--tooltipbg:#101d30;--tooltipborder:#3d5a80;--tipdate:#8fb4dd;--tooltip-line:rgba(61,90,128,.45);--tooltiptext:#c9d6e6;--tooltip-strong:#ffffff;--storyhead:#ffffff;--storysub:#7f96b2;--storybody:#dfe8f2;--storyen:#8da3bd;--noticebg:#2a1a12;--noticeborder:#6b3b1e;--link:#ff9d6b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--text);
+padding-bottom:74px;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg2),var(--bg));
+padding:12px 14px 10px;border-bottom:1px solid var(--line)}
+.toprow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.topbar h1{font-size:19px;margin:0;display:flex;align-items:center;gap:8px}
+.topbar h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block}
+.topbar .sub{font-size:12px;color:var(--muted);margin-top:3px}
+.toolbar{display:flex;gap:6px;flex-shrink:0}
+.toolbtn{padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;line-height:1.2}
+.toolbtn:hover{background:var(--card2)}
+.content{padding:14px 14px 20px;max-width:1180px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:11px 2px;border-bottom:1px solid var(--rowline)}
+.row:last-child{border-bottom:none}
+.board-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.board-grid .row{background:var(--card2);border:1px solid var(--rowline);border-radius:10px;padding:12px 10px}
+.board-grid .row:last-child{border-bottom:1px solid var(--rowline)}
+.board-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.board-head .muted{line-height:1.45}
+.name{font-size:14px;line-height:1.35;padding-right:10px}
+.name .tag{display:inline-block;font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:6px;
+padding:1px 5px;margin-left:6px;vertical-align:1px}
+.val{font-size:15px;font-weight:600;white-space:nowrap}
+.chg{font-size:12px;margin-left:8px;display:inline-block;min-width:56px;text-align:right}
+.up{color:var(--bad)} .down{color:var(--good)} .flat{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;border-radius:10px;
+border:none;font-size:15px;font-weight:600;color:#fff;background:var(--accent);width:100%;cursor:pointer}
+.btn.secondary{background:var(--btn2)}
+.btn.small{width:auto;padding:8px 12px;font-size:13px}
+.input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--inputbg);color:var(--text);font-size:15px}
+.muted{color:var(--muted);font-size:12px}
+.notice{background:var(--noticebg);border:1px solid var(--noticeborder);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text)}
+.notice a{color:var(--link)}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;
+animation:spin .8s linear infinite;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--tabbg);border-top:1px solid var(--line);
+display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:10px 0 8px;color:var(--muted);font-size:12px;cursor:pointer}
+.tab.active{color:var(--accent)}
+.tab .ico{font-size:20px;display:block;margin-bottom:2px}
+.seg{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.seg button{flex:1;min-width:74px;padding:9px 4px;border-radius:9px;border:1px solid var(--line);
+background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chkrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--rowline);font-size:13px}
+.chkrow input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.chkrow .nm{flex:1;line-height:1.35}
+.chkrow .meta{font-size:11px;color:var(--muted);white-space:nowrap}
+.ranges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ranges button{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;
+color:var(--muted);font-size:12px;cursor:pointer}
+.ranges button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.dates{display:flex;gap:8px;margin-bottom:10px}
+.dates input{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--inputbg);color:var(--text);font-size:13px}
+canvas{width:100%;height:220px;background:var(--canvasbg);border-radius:10px;display:block}
+.chartwrap{position:relative;background:var(--canvasbg);border-radius:8px;overflow:hidden;min-height:280px}
+.chartwrap canvas{display:block;width:100%;height:300px;touch-action:none}
+.tip{position:absolute;display:none;z-index:30;width:min(360px,calc(100% - 16px));max-width:none;
+background:var(--tooltipbg);border:1px solid var(--tooltipborder);border-radius:10px;
+padding:10px 12px;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;
+max-height:calc(100% - 16px);overflow-y:auto;overscroll-behavior:contain;color:var(--tooltiptext)}
+.tipdate{color:var(--tipdate);font-size:13px;margin-bottom:6px;font-weight:600;position:sticky;top:-10px;
+background:var(--tooltipbg);padding:8px 0 5px;z-index:1}
+.tiprow{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;column-gap:7px;
+padding:5px 0;border-top:1px solid var(--tooltip-line);font-size:12px;color:var(--tooltiptext);line-height:1.35}
+.tiprow i{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
+.tiplabel{min-width:0;overflow-wrap:anywhere;color:var(--tooltiptext)}
+.tipvalue{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.tiprow b{font-size:13px;color:var(--tooltip-strong)}
+.tipyoy{grid-column:2/4;font-size:11px;color:var(--muted);margin-top:1px}
+.legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 14px;margin:10px 2px 0;font-size:12px}
+.legend span{display:flex;align-items:flex-start;gap:6px;min-width:0;line-height:1.4}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.legend-label{min-width:0;overflow-wrap:anywhere}
+select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--inputbg);color:var(--text);font-size:14px}
+.stat{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.stat div{flex:1;min-width:90px;background:var(--card2);border-radius:9px;padding:8px;text-align:center}
+.stat b{display:block;font-size:15px;margin-top:2px}
+.series-picker{padding:8px 10px;background:var(--card2);border:1px solid var(--line);border-radius:8px}
+.period-summary{margin-top:14px;border-top:1px solid var(--line)}
+.summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 2px 9px}
+.summary-head strong{font-size:14px}
+.summary-head span{font-size:12px;color:var(--muted);text-align:right}
+.summary-item{padding:11px 2px;border-top:1px solid var(--rowline)}
+.summary-series{display:flex;align-items:flex-start;gap:7px;font-size:13px;line-height:1.45;margin-bottom:8px}
+.summary-series i{width:10px;height:10px;border-radius:2px;flex:none;margin-top:4px}
+.summary-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.summary-values div{background:var(--card2);border-radius:6px;padding:8px 7px;text-align:center;min-width:0}
+.summary-values span{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+.summary-values b{display:block;font-size:14px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:7px 4px;text-align:left;border-bottom:1px solid var(--rowline)}
+th{color:var(--muted);font-weight:500}
+.scroll{max-height:300px;overflow-y:auto}
+.story .sh{font-size:calc(var(--rfs,15px)*1.1);font-weight:700;line-height:1.5;color:var(--storyhead);
+border-left:3px solid var(--accent);padding-left:10px}
+.story .seh{font-size:calc(var(--rfs,15px)*0.82);color:var(--storysub);margin-top:4px;line-height:1.5}
+.story .sb{font-size:var(--rfs,15px);line-height:var(--rlh,1.75);color:var(--storybody);margin-top:8px}
+.story .sb p{margin:0 0 var(--rpm,10px)}
+.story .seb{font-size:calc(var(--rfs,15px)*0.82);line-height:var(--rlh,1.75);color:var(--storyen);margin-top:10px;
+border-top:1px dashed var(--line);padding-top:8px}
+.story .seb p{margin:0 0 var(--rpm,10px)}
+.preamble-body{font-size:var(--rfs,15px);line-height:var(--rlh,1.75);color:var(--text);margin-top:6px}
+.preamble-body p{margin:0 0 var(--rpm,10px)}
+.report-tools{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.report-tools .input{flex:1;min-width:0}
+.report-count{font-size:12px;color:var(--muted);white-space:nowrap}
+.story-index{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;margin-right:6px;vertical-align:2px}
+.readrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rowline)}
+.readrow:last-child{border-bottom:none}
+.readlabel{width:44px;flex:none;font-size:13px;color:var(--muted)}
+.readbtns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.readbtns button{padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:13px;cursor:pointer}
+.readbtns button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+#sizeVal{min-width:30px;text-align:center;font-size:13px;color:var(--text)}
+@media(max-width:560px){
+  .dates{flex-direction:column}
+  .chartwrap{min-height:300px}
+  .legend{grid-template-columns:1fr}
+  .tip{left:8px!important;width:calc(100% - 16px)}
+  .summary-head{align-items:flex-start;flex-direction:column;gap:3px}
+  .summary-head span{text-align:left}
+}
+@media(min-width:900px){.content{padding-left:22px;padding-right:22px}.chartwrap canvas{height:340px}.chartwrap{min-height:340px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="toprow">
+    <div>
+      <h1><span class="dot"></span>Argus 价格台</h1>
+      <div class="sub" id="statusLine">加载中…</div>
+    </div>
+    <div class="toolbar">
+      <button class="toolbtn" id="themeBtn" onclick="cycleTheme()" title="切换背景颜色">🎨 牛皮纸</button>
+      <button class="toolbtn" id="readBtn" onclick="toggleReadPanel()" title="字号 / 字体 / 行距 / 段落" style="display:none">📖 阅读设置</button>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="view"></div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="ws" onclick="showTab('ws')"><span class="ico">📊</span>价格台</div>
+  <div class="tab" data-tab="reports" onclick="showTab('reports')"><span class="ico">📄</span>日报</div>
+  <div class="tab" data-tab="ai" onclick="showTab('ai')"><span class="ico">🤖</span>AI</div>
+</div>
+
+<script>
+let catalog = [];
+let workspace = {selected: [], diff: null};
+let wsSub = 'board';
+let boardRequestId = 0;
+const COLORS = ['#e05b2c','#2ecc71','#4da3ff','#f1c40f','#9b59b6','#1abc9c','#ff6b5e','#95a5a6','#e84393','#00cec9'];
+const ENGINE_LABEL = {'RapidOCR':'RapidOCR（本地）','Umi-OCR':'Umi-OCR（Paddle）','Unlimited-OCR':'Unlimited-OCR（GPU）'};
+
+// ================= 主题（牛皮纸 / 淡绿 / 深色） =================
+const THEMES = [{id:'kraft', label:'牛皮纸'}, {id:'green', label:'淡绿'}, {id:'dark', label:'深色'}];
+let themeId = localStorage.getItem('argus_theme') || 'kraft';
+const chartRedraws = [];
+
+function cssVar(name, fb){
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name);
+  return (v||'').trim() || fb;
+}
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', themeId);
+  const b = document.getElementById('themeBtn');
+  if(b){
+    const t = THEMES.find(x=>x.id===themeId);
+    b.textContent = '🎨 ' + (t ? t.label : '牛皮纸');
+  }
+  try{ localStorage.setItem('argus_theme', themeId); }catch(e){}
+  chartRedraws.forEach(fn=>{ try{ fn(); }catch(e){} });
+}
+
+function cycleTheme(){
+  const i = THEMES.findIndex(x=>x.id===themeId);
+  themeId = THEMES[(i+1)%THEMES.length].id;
+  applyTheme();
+}
+
+// ================= 阅读设置（字号 / 字体 / 行距 / 段落） =================
+let readSettings = {size:17, family:'default', line:1.75, para:10};
+try{ Object.assign(readSettings, JSON.parse(localStorage.getItem('argus_read')||'{}')); }catch(e){}
+
+function saveRead(){ try{ localStorage.setItem('argus_read', JSON.stringify(readSettings)); }catch(e){} }
+
+function applyReadSettings(){
+  const r = document.getElementById('rcontent');
+  if(r){
+    r.style.setProperty('--rfs', readSettings.size + 'px');
+    r.style.setProperty('--rff',
+      readSettings.family==='song' ? "'SimSun','宋体',serif"
+      : readSettings.family==='kai' ? "'KaiTi','楷体',serif" : 'inherit');
+    r.style.setProperty('--rlh', readSettings.line);
+    r.style.setProperty('--rpm', readSettings.para + 'px');
+  }
+  const sizeEl = document.getElementById('sizeVal');
+  if(sizeEl) sizeEl.textContent = readSettings.size;
+  const panel = document.getElementById('readpanel');
+  if(panel){
+    panel.querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on', b.dataset.f===readSettings.family));
+    panel.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on', Math.abs(parseFloat(b.dataset.l)-readSettings.line)<0.01));
+    panel.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('on', parseInt(b.dataset.p,10)===readSettings.para));
+  }
+}
+
+function toggleReadPanel(){
+  const p = document.getElementById('readpanel');
+  if(p) p.style.display = p.style.display==='none' ? 'block' : 'none';
+}
+
+function adjSize(d){
+  readSettings.size = Math.min(24, Math.max(12, readSettings.size + d));
+  saveRead(); applyReadSettings();
+}
+
+function setReadFam(f){ readSettings.family = f; saveRead(); applyReadSettings(); }
+function setReadLine(l){ readSettings.line = parseFloat(l); saveRead(); applyReadSettings(); }
+function setReadPara(p){ readSettings.para = parseInt(p,10); saveRead(); applyReadSettings(); }
+
+async function api(path, opts){
+  const r = await fetch(path, Object.assign({headers:{'Accept':'application/json'}}, opts||{}));
+  if(r.status===401){location.href='/';throw new Error('login');}
+  let data;
+  try{ data = await r.json(); }catch(e){ throw new Error('服务返回了无效数据（HTTP '+r.status+'）'); }
+  if(!r.ok) throw new Error(data.error || ('请求失败（HTTP '+r.status+'）'));
+  return data;
+}
+
+function todayStr(offset){
+  // 使用本地日期，避免北京时间 00:00-08:00 被 toISOString() 算成前一天。
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  d.setDate(d.getDate() - (offset||0));
+  return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+
+function esc(v){
+  return String(v===null||v===undefined?'':v).replace(/[&<>"']/g, ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+async function init(){
+  if(location.protocol==='file:'){
+    document.getElementById('statusLine').textContent = '未连接 Argus 后台服务';
+    document.getElementById('view').innerHTML = `
+      <div class="notice">
+        <b>价格台当前未连接后台服务</b><br>
+        你现在是直接打开了 HTML 文件，价格、趋势和日报接口无法工作。<br>
+        请先双击项目目录里的「启动Argus助手.bat」，再打开
+        <a href="http://127.0.0.1:8768/">http://127.0.0.1:8768/</a>。
+      </div>`;
+    return;
+  }
+  try{
+    const st = await api('/api/status');
+    document.getElementById('statusLine').textContent =
+      '价格目录 ' + st.catalog_count + ' 项 · ' + st.time.slice(5,16);
+  }catch(e){}
+  try{ catalog = (await api('/api/catalog')).items; }catch(e){}
+  try{ workspace = await api('/api/workspace'); }catch(e){}
+  if(!workspace.selected) workspace.selected = [];
+  showTab('ws');
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  const rb = document.getElementById('readBtn');
+  if(rb) rb.style.display='none';
+  if(name==='ws') renderWS();
+  if(name==='reports') renderReports();
+  if(name==='ai') renderAI();
+}
+
+function seg(name){
+  wsSub = name;
+  renderWS();
+}
+
+// ================= 价格台 =================
+function renderWS(){
+  const v = document.getElementById('view');
+  v.innerHTML = `
+    <div class="seg">
+      <button class="${wsSub==='board'?'on':''}" onclick="seg('board')">我的台</button>
+      <button class="${wsSub==='picker'?'on':''}" onclick="seg('picker')">添加价格</button>
+      <button class="${wsSub==='trend'?'on':''}" onclick="seg('trend')">趋势</button>
+      <button class="${wsSub==='diff'?'on':''}" onclick="seg('diff')">价差</button>
+      <button class="${wsSub==='calc'?'on':''}" onclick="seg('calc')">长协定价</button>
+    </div>
+    <div id="wsbox"></div>`;
+  if(wsSub==='board') renderBoard();
+  if(wsSub==='picker') renderPicker();
+  if(wsSub==='trend') renderTrend();
+  if(wsSub==='diff') renderDiff();
+  if(wsSub==='calc') renderCalc();
+}
+
+function keyName(k){ const c = catalog.find(x=>x.key===k); return c?c.name:k; }
+
+async function renderBoard(){
+  const box = document.getElementById('wsbox');
+  if(!workspace.selected.length){
+    box.innerHTML = '<div class="card muted">价格台还是空的，点「添加价格」勾选你要的价格。</div>';
+    return;
+  }
+  box.innerHTML = '<div class="card"><span class="spinner"></span> 加载价格台…</div>';
+  const requestId = ++boardRequestId;
+  try{
+    const d = await api('/api/board?date='+todayStr(0)+'&keys='+workspace.selected.join(','));
+    if(requestId!==boardRequestId || !document.getElementById('wsbox')) return;
+    box.innerHTML = '<div class="card"><div class="board-head"><div class="muted">数据日期：'+esc(d.date)
+      + (d.fallback ? '（所选日期无报价，自动显示最近交易日）' : '')
+      + ' · <a href="#" onclick="event.preventDefault();seg(\'picker\')" style="color:var(--link)">管理价格</a></div>'
+      + '<button class="toolbtn" onclick="renderBoard()" title="重新读取最新报价">↻ 刷新</button></div>'
+      + '<div class="board-grid">'
+      + (d.rows||[]).map(r=>{
+          const chg = r.change||'';
+          const cls = chg.startsWith('+')?'up':chg.startsWith('-')?'down':'flat';
+          const disp = r.value!==null&&r.value!==undefined?r.value:'—';
+          return '<div class="row"><div class="name">'+esc(r.name)+'<span class="tag">'+esc(r.freq||'')+'</span></div>'
+            + '<div><span class="val">'+esc(disp)+'</span><span class="chg '+cls+'">'+esc(chg)+'</span></div></div>';
+        }).join('')
+       + '</div></div>';
+  }catch(e){ if(requestId===boardRequestId) box.innerHTML = '<div class="card">加载失败：'+esc(e.message||e)+' <button class="toolbtn" onclick="renderBoard()">重试</button></div>'; }
+}
+
+let pickerState = {q:'', cat:'煤炭'};
+function renderPicker(){
+  const v = document.getElementById('wsbox');
+  v.innerHTML = `
+    <div class="card">
+      <input class="input" id="pq" placeholder="搜索名称或代码" value="${pickerState.q}"
+        oninput="pickerState.q=this.value;renderPickList()">
+      <div style="height:8px"></div>
+      <div class="ranges">
+        <button class="${pickerState.cat==='煤炭'?'on':''}" onclick="setCat('煤炭')">煤炭</button>
+        <button class="${pickerState.cat==='其他'?'on':''}" onclick="setCat('其他')">其他</button>
+        <button class="${pickerState.cat==='全部'?'on':''}" onclick="setCat('全部')">全部</button>
+      </div>
+    </div>
+    <div id="picklist"></div>
+    <button class="btn" onclick="saveWorkspace()">保存价格台</button>
+    <div class="muted" style="margin-top:6px">已选 ${workspace.selected.length} 项</div>`;
+  renderPickList();
+}
+
+function setCat(c){ pickerState.cat = c; renderPicker(); }
+
+function renderPickList(){
+  const box = document.getElementById('picklist');
+  if(!box) return;
+  const q = pickerState.q.trim().toLowerCase();
+  let items = catalog.filter(c=>{
+    if(pickerState.cat!=='全部' && c.cat!==pickerState.cat) return false;
+    if(q && !(c.name.toLowerCase().includes(q) || c.code.includes(q))) return false;
+    return true;
+  });
+  box.innerHTML = '<div class="card scroll">'
+    + items.map(c=>{
+        const on = workspace.selected.includes(c.key);
+        return '<label class="chkrow"><input type="checkbox" '+(on?'checked':'')
+          +' onchange="toggleKey(\''+c.key+'\',this.checked)">'
+          +'<span class="nm">'+c.name+'</span><span class="meta">'+(c.freq||'')+'</span></label>';
+      }).join('')
+    + '</div>';
+}
+
+function toggleKey(key, on){
+  const i = workspace.selected.indexOf(key);
+  if(on && i<0) workspace.selected.push(key);
+  if(!on && i>=0) workspace.selected.splice(i,1);
+}
+
+async function saveWorkspace(){
+  await api('/api/workspace', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(workspace)});
+  seg('board');
+}
+
+// ================= 趋势 =================
+let trendState = {range:'30', start:todayStr(29), end:todayStr(0), keys:[]};
+let trendRequestId = 0;
+async function renderTrend(){
+  const box = document.getElementById('wsbox');
+  if(!workspace.selected.length){
+    box.innerHTML = '<div class="card muted">价格台为空，先在「添加价格」里勾选。</div>';
+    return;
+  }
+  trendState.keys = workspace.selected.slice();
+  box.innerHTML = `
+    <div class="card">
+      <div class="ranges" id="tranges">
+        <button data-range="7" class="${trendState.range==='7'?'on':''}" onclick="setRange('7')">7天</button>
+        <button data-range="30" class="${trendState.range==='30'?'on':''}" onclick="setRange('30')">30天</button>
+        <button data-range="90" class="${trendState.range==='90'?'on':''}" onclick="setRange('90')">90天</button>
+        <button data-range="365" class="${trendState.range==='365'?'on':''}" onclick="setRange('365')">1年</button>
+        <button data-range="custom" class="${trendState.range==='custom'?'on':''}" onclick="setRange('custom')">自定义</button>
+      </div>
+      <div class="dates">
+        <input type="date" id="tstart" value="${trendState.start}" onchange="setTrendDate('start',this.value)">
+        <input type="date" id="tend" value="${trendState.end}" onchange="setTrendDate('end',this.value)">
+      </div>
+      <div class="series-picker" id="tseries"></div>
+    </div>
+    <div class="chartwrap">
+      <canvas id="tchart"></canvas>
+      <div class="tip" id="ttooltip"></div>
+    </div>
+    <div class="legend" id="tlegend"></div>
+    <div class="period-summary" id="tstat"></div>`;
+  renderSeriesBox();
+  loadTrend();
+}
+
+function renderSeriesBox(){
+  const box = document.getElementById('tseries');
+  if(!box) return;
+  box.innerHTML = workspace.selected.map(k=>{
+    const on = trendState.keys.includes(k);
+    return '<label class="chkrow"><input type="checkbox" '+(on?'checked':'')
+      +' onchange="toggleTrendKey(\''+k+'\',this.checked)">'
+      +'<span class="nm">'+keyName(k)+'</span></label>';
+  }).join('');
+}
+
+function toggleTrendKey(k,on){
+  const i = trendState.keys.indexOf(k);
+  if(on && i<0) trendState.keys.push(k);
+  if(!on && i>=0) trendState.keys.splice(i,1);
+  loadTrend();
+}
+
+function setRange(r){
+  trendState.range = r;
+  if(r==='7'){ trendState.start=todayStr(6); trendState.end=todayStr(0); }
+  if(r==='30'){ trendState.start=todayStr(29); trendState.end=todayStr(0); }
+  if(r==='90'){ trendState.start=todayStr(89); trendState.end=todayStr(0); }
+  if(r==='365'){ trendState.start=todayStr(364); trendState.end=todayStr(0); }
+  renderTrend();
+}
+
+function setTrendDate(which, value){
+  if(!value) return;
+  trendState[which] = value;
+  if(trendState.start > trendState.end){
+    if(which==='start') trendState.end = value;
+    else trendState.start = value;
+  }
+  trendState.range = 'custom';
+  const startEl = document.getElementById('tstart');
+  const endEl = document.getElementById('tend');
+  if(startEl) startEl.value = trendState.start;
+  if(endEl) endEl.value = trendState.end;
+  document.querySelectorAll('#tranges button').forEach(btn=>
+    btn.classList.toggle('on', btn.dataset.range==='custom'));
+  loadTrend();
+}
+
+async function loadTrend(){
+  const canvas = document.getElementById('tchart');
+  if(!canvas || !trendState.keys.length) return;
+  const requestId = ++trendRequestId;
+  try{
+  const d = await api('/api/history?keys='+encodeURIComponent(trendState.keys.join(','))
+    +'&start='+encodeURIComponent(trendState.start)+'&end='+encodeURIComponent(trendState.end));
+  if(requestId!==trendRequestId || !document.getElementById('tchart')) return;
+  if(!d.ok){ document.getElementById('tstat').innerHTML='<div class="card">'+d.error+'</div>'; return; }
+  const series = {};
+  trendState.keys.forEach((k,i)=>{
+    const m = d.series[k]||{};
+    series[k] = {key:k, label:keyName(k), color:COLORS[i%COLORS.length],
+      points: d.dates.filter(dt=>m[dt]!==undefined && m[dt]!=='' && Number.isFinite(parseFloat(m[dt])))
+        .map(dt=>({date:dt, v:parseFloat(m[dt])}))};
+  });
+  initChart('tchart','ttooltip', d.dates, series, true);
+   document.getElementById('tlegend').innerHTML =
+     trendState.keys.map((k,i)=>'<span><i style="background:'+COLORS[i%COLORS.length]+'"></i><span class="legend-label">'+esc(keyName(k))+'</span></span>').join('');
+  const stat = document.getElementById('tstat');
+  stat.innerHTML = '<div class="summary-head"><strong>区间统计</strong><span>'+trendState.start+' 至 '+trendState.end+'</span></div>'
+    +trendState.keys.map((k,i)=>{
+      const p = series[k].points;
+      const values = p.map(x=>x.v);
+      const avg = values.length?(values.reduce((sum,v)=>sum+v,0)/values.length).toFixed(2):'—';
+      const min = values.length?Math.min(...values).toFixed(2):'—';
+      const max = values.length?Math.max(...values).toFixed(2):'—';
+      return '<div class="summary-item"><div class="summary-series"><i style="background:'+COLORS[i%COLORS.length]+'"></i>'
+        +'<span>'+keyName(k)+'</span></div><div class="summary-values">'
+        +'<div><span>平均值</span><b>'+avg+'</b></div>'
+        +'<div><span>最高值</span><b>'+max+'</b></div>'
+        +'<div><span>最低值</span><b>'+min+'</b></div></div></div>';
+     }).join('');
+  }catch(e){
+    if(requestId===trendRequestId){ const stat=document.getElementById('tstat'); if(stat) stat.innerHTML='<div class="card">趋势加载失败：'+esc(e.message||e)+' <button class="toolbtn" onclick="loadTrend()">重试</button></div>'; }
+  }
+}
+
+// ================= 价差 =================
+let diffState = {a:'', b:'', range:'30', start:todayStr(30), end:todayStr(0)};
+let diffRequestId = 0;
+function renderDiff(){
+  const box = document.getElementById('wsbox');
+  if(workspace.selected.length < 2){
+    box.innerHTML = '<div class="card muted">价差需要至少两个价格，先在「添加价格」里勾选。</div>';
+    return;
+  }
+  if(!diffState.a) diffState.a = workspace.selected[0];
+  if(!diffState.b) diffState.b = workspace.selected[1];
+  const opts = workspace.selected.map(k=>'<option value="'+k+'" '+(diffState.a===k?'selected':'')+'>'+keyName(k)+'</option>').join('');
+  const opts2 = workspace.selected.map(k=>'<option value="'+k+'" '+(diffState.b===k?'selected':'')+'>'+keyName(k)+'</option>').join('');
+  box.innerHTML = `
+    <div class="card">
+      <div class="ranges">
+        <button class="${diffState.range==='30'?'on':''}" onclick="setDiffRange('30')">30天</button>
+        <button class="${diffState.range==='90'?'on':''}" onclick="setDiffRange('90')">90天</button>
+        <button class="${diffState.range==='365'?'on':''}" onclick="setDiffRange('365')">1年</button>
+      </div>
+      <div class="dates">
+        <input type="date" id="dstart" value="${diffState.start}" onchange="diffState.start=this.value">
+        <input type="date" id="dend" value="${diffState.end}" onchange="diffState.end=this.value">
+      </div>
+      <select onchange="diffState.a=this.value;loadDiff()">${opts}</select>
+      <div style="height:8px"></div>
+      <select onchange="diffState.b=this.value;loadDiff()">${opts2}</select>
+      <div class="muted" style="margin-top:6px">价差 = 第一个 − 第二个（美元/吨）</div>
+    </div>
+    <div class="chartwrap">
+      <canvas id="dchart"></canvas>
+      <div class="tip" id="dtooltip"></div>
+    </div>
+    <div id="dstat"></div>
+    <div class="scroll" id="dtable" style="margin-top:10px"></div>`;
+  loadDiff();
+}
+
+function setDiffRange(r){
+  diffState.range = r;
+  if(r==='30'){ diffState.start=todayStr(30); diffState.end=todayStr(0); }
+  if(r==='90'){ diffState.start=todayStr(90); diffState.end=todayStr(0); }
+  if(r==='365'){ diffState.start=todayStr(365); diffState.end=todayStr(0); }
+  renderDiff();
+}
+
+async function loadDiff(){
+  const canvas = document.getElementById('dchart');
+  if(!canvas || !diffState.a || !diffState.b) return;
+  const requestId = ++diffRequestId;
+  try{
+  const d = await api('/api/history?keys='+encodeURIComponent(diffState.a+','+diffState.b)
+    +'&start='+encodeURIComponent(diffState.start)+'&end='+encodeURIComponent(diffState.end));
+  if(requestId!==diffRequestId || !document.getElementById('dchart')) return;
+  if(!d.ok){ document.getElementById('dstat').innerHTML='<div class="card">'+d.error+'</div>'; return; }
+  const ma = d.series[diffState.a]||{}, mb = d.series[diffState.b]||{};
+  const pts = d.dates.filter(dt=>ma[dt]!==undefined && mb[dt]!==undefined && ma[dt]!=='' && mb[dt]!=='')
+    .map(dt=>({date:dt, v:parseFloat(ma[dt])-parseFloat(mb[dt])}));
+  const series = {'spread': {key:'spread', label:keyName(diffState.a)+' − '+keyName(diffState.b),
+    color:'#e05b2c', points:pts}};
+  initChart('dchart','dtooltip', d.dates, series, false);
+  const last = pts.length?pts[pts.length-1].v.toFixed(2):'—';
+  const min = pts.length?Math.min(...pts.map(x=>x.v)).toFixed(2):'—';
+  const max = pts.length?Math.max(...pts.map(x=>x.v)).toFixed(2):'—';
+  document.getElementById('dstat').innerHTML =
+    '<div class="stat"><div>最新价差<b>'+last+'</b></div><div>最低<b>'+min+'</b></div>'
+    +'<div>最高<b>'+max+'</b></div><div>数据点<b>'+pts.length+'</b></div></div>';
+  document.getElementById('dtable').innerHTML = '<table><tr><th>日期</th><th>价差</th></tr>'
+    +pts.slice(-60).reverse().map(p=>'<tr><td>'+p.date+'</td><td>'+p.v.toFixed(2)+'</td></tr>').join('')
+     +'</table>';
+  }catch(e){ if(requestId===diffRequestId){ const stat=document.getElementById('dstat'); if(stat) stat.innerHTML='<div class="card">价差加载失败：'+esc(e.message||e)+' <button class="toolbtn" onclick="loadDiff()">重试</button></div>'; } }
+}
+
+// ================= 画图 =================
+const yoyCache = {};
+let chartHover = null; // {canvasId, tipId, allDates, series, withYoy}
+
+function fmtAxisDate(iso){ const p=iso.split('-'); return p[1]+'-'+p[2]; }
+
+async function fetchYoy(key, date){
+  const ck = key+'|'+date;
+  if(ck in yoyCache) return yoyCache[ck];
+  yoyCache[ck] = 'loading';
+  try{
+    const r = await api('/api/yoy?key='+encodeURIComponent(key)+'&date='+date);
+    yoyCache[ck] = r.ok ? r.value : null;
+  }catch(e){ yoyCache[ck] = null; }
+  return yoyCache[ck];
+}
+
+function initChart(canvasId, tipId, allDates, seriesMap, withYoy){
+  const canvas = document.getElementById(canvasId);
+  const tip = document.getElementById(tipId);
+  if(!canvas || !tip) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const seriesList = Object.values(seriesMap).filter(s=>s.points.length>0);
+  const dateIndex = new Map(allDates.map((dt,i)=>[dt,i]));
+  const pointMap = {};
+  Object.keys(seriesMap).forEach(k=>{
+    pointMap[k] = {};
+    seriesMap[k].points.forEach(p=>pointMap[k][p.date]=p.v);
+  });
+  const C = {cssW:0, cssH:Math.max(300, 110+seriesList.length*45), L:54, R:16, T:16, B:34};
+  let min = Infinity, max = -Infinity;
+  seriesList.forEach(s=>s.points.forEach(p=>{
+    if(p.v<min) min=p.v; if(p.v>max) max=p.v;
+  }));
+  if(!isFinite(min)){ min=0; max=1; }
+  const pad = (max-min)*0.08 || 1;
+  min -= pad; max += pad;
+
+  function xFor(dt){
+    const i = dateIndex.get(dt) ?? 0;
+    return C.L + (i+0.5)/Math.max(allDates.length,1)*(C.cssW-C.L-C.R);
+  }
+  function yFor(v){ return C.T + (1-(v-min)/(max-min))*(C.cssH-C.T-C.B); }
+
+  function size(){
+    const r = canvas.getBoundingClientRect();
+    C.cssW = r.width || 320;
+    canvas.width = C.cssW*dpr;
+    canvas.height = C.cssH*dpr;
+    canvas.style.height = C.cssH+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function draw(idx){
+    size();
+    ctx.clearRect(0,0,C.cssW,C.cssH);
+    ctx.fillStyle = cssVar('--canvasbg','#f6eeda');
+    ctx.fillRect(0,0,C.cssW,C.cssH);
+    // 网格 + Y轴刻度（放大字号）
+    ctx.strokeStyle = cssVar('--grid','#e2d3b2'); ctx.lineWidth = 1;
+    ctx.fillStyle = cssVar('--axis','#8a7355'); ctx.font = '12px sans-serif';
+    for(let i=0;i<=4;i++){
+      const yy = C.T + i/4*(C.cssH-C.T-C.B);
+      ctx.beginPath(); ctx.moveTo(C.L,yy); ctx.lineTo(C.cssW-C.R,yy); ctx.stroke();
+      const v = max - i/4*(max-min);
+      ctx.textAlign='right';
+      ctx.fillText(v>=100?v.toFixed(0):v.toFixed(1), C.L-8, yy+4);
+    }
+    // X轴刻度（放大字号）
+    ctx.font = '12px sans-serif'; ctx.textAlign='center';
+    const tickN = Math.min(6, allDates.length);
+    if(tickN===1){
+      ctx.fillText(fmtAxisDate(allDates[0]), xFor(allDates[0]), C.cssH-12);
+    }else{
+      for(let i=0;i<tickN;i++){
+        const ii = Math.round(i*(allDates.length-1)/(tickN-1));
+        const dt = allDates[ii];
+        ctx.fillText(fmtAxisDate(dt), xFor(dt), C.cssH-12);
+      }
+    }
+    // 折线（平滑曲线）
+    seriesList.forEach(s=>{
+      ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.lineJoin='round';
+      ctx.beginPath();
+      s.points.forEach((p,i)=>{
+        const xx = xFor(p.date), yy = yFor(p.v);
+        if(i===0) ctx.moveTo(xx,yy);
+        else{
+          const prev = s.points[i-1];
+          const mx = (xFor(prev.date)+xx)/2;
+          ctx.bezierCurveTo(mx, yFor(prev.v), mx, yy, xx, yy);
+        }
+      });
+      ctx.stroke();
+    });
+    // 十字指针
+    if(idx>=0 && idx<allDates.length){
+      const dt = allDates[idx];
+      const xx = xFor(dt);
+      ctx.setLineDash([5,4]);
+      ctx.strokeStyle = '#5b7ca3'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xx,C.T); ctx.lineTo(xx,C.cssH-C.B); ctx.stroke();
+      ctx.setLineDash([]);
+      seriesList.forEach(s=>{
+        if(pointMap[s.key] !== undefined && pointMap[s.key][dt] !== undefined){
+          ctx.fillStyle = s.color;
+          ctx.beginPath(); ctx.arc(xx, yFor(pointMap[s.key][dt]), 4.5, 0, 7); ctx.fill();
+          ctx.strokeStyle = cssVar('--canvasbg','#f6eeda'); ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(xx, yFor(pointMap[s.key][dt]), 4.5, 0, 7); ctx.stroke();
+        }
+      });
+    }
+  }
+
+  function idxFromEvent(e){
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const n = Math.max(allDates.length,1);
+    let ii = Math.round((x-C.L)/((C.cssW-C.L-C.R)/n) - 0.5);
+    ii = Math.max(0, Math.min(allDates.length-1, ii));
+    return ii;
+  }
+
+  let activeTipIndex = -1;
+  function updateTip(idx){
+    try{
+      if(idx<0 || idx>=allDates.length){ tip.style.display='none'; return; }
+      activeTipIndex = idx;
+      const dt = allDates[idx];
+      const xx = xFor(dt);
+      tip.style.display = 'block';
+      const tipWidth = Math.min(360, Math.max(C.cssW-16, 0));
+      const preferredLeft = xx<C.cssW/2 ? xx+12 : xx-tipWidth-12;
+      tip.style.left = Math.min(Math.max(preferredLeft, 8), Math.max(C.cssW-tipWidth-8, 8)) + 'px';
+      tip.style.top = '8px';
+      let html = '<div class="tipdate">'+dt+'</div>';
+      for(const s of seriesList){
+        const v = pointMap[s.key] && pointMap[s.key][dt];
+        if(v === undefined){ continue; }
+        const pts = s.points;
+        let chg = '';
+        const pi = pts.findIndex(p=>p.date===dt);
+        if(pi>0){
+          const diff = pts[pi].v - pts[pi-1].v;
+          chg = '<span class="'+(diff>0?'up':'down')+'">'+fmtPm(diff)+'</span>';
+        }
+        let yoy = '';
+        if(withYoy){
+          const yv = yoyCache[s.key+'|'+dt];
+          if(yv === undefined || yv === 'loading') yoy = '同比 …';
+          else if(yv === null) yoy = '同比无数据';
+          else yoy = '同比 '+fmtPm(v - parseFloat(yv))+'（'+parseFloat(yv).toFixed(2)+'）';
+        }
+        html += '<div class="tiprow"><i style="background:'+s.color+'"></i>'
+          + '<span class="tiplabel">'+s.label+'</span>'
+          + '<span class="tipvalue"><b>'+parseFloat(v).toFixed(2)+'</b>'+chg+'</span>'
+          + (withYoy?'<div class="tipyoy">'+yoy+'</div>':'')+'</div>';
+      }
+      tip.innerHTML = html;
+      if(withYoy){
+        const need = seriesList.filter(s=>{
+          const v = pointMap[s.key] && pointMap[s.key][dt];
+          return v !== undefined && !((s.key+'|'+dt) in yoyCache);
+        });
+        need.forEach(s=>{
+          fetchYoy(s.key, dt).then(()=>{ if(activeTipIndex===idx) updateTip(idx); }).catch(()=>{});
+        });
+      }
+    }catch(err){ /* 忽略悬停过程中的异常，避免卡死 */ }
+  }
+
+  let rafPending = false, lastEv = null;
+  function onMove(e){
+    lastEv = e;
+    if(rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(()=>{
+      rafPending = false;
+      const ev = lastEv; lastEv = null;
+      if(!ev) return;
+      try{
+        const idx = idxFromEvent(ev);
+        draw(idx);
+        updateTip(idx);
+      }catch(err){ /* 忽略悬停过程中的异常，避免卡死 */ }
+    });
+  }
+  function onLeave(){
+    rafPending = false; lastEv = null;
+    activeTipIndex = -1;
+    try{ draw(-1); }catch(err){}
+    tip.style.display='none';
+  }
+  canvas.onpointermove = onMove;
+  canvas.onpointerdown = onMove;
+  canvas.onpointerleave = onLeave;
+  try{ draw(-1); }catch(err){}
+  if(canvas._chartResizeObserver) canvas._chartResizeObserver.disconnect();
+  if('ResizeObserver' in window){
+    canvas._chartResizeObserver = new ResizeObserver(()=>{
+      try{ draw(activeTipIndex); }catch(err){}
+    });
+    canvas._chartResizeObserver.observe(canvas.parentElement);
+  }
+  if(canvas._argusRedraw && chartRedraws.includes(canvas._argusRedraw)){
+    chartRedraws.splice(chartRedraws.indexOf(canvas._argusRedraw), 1);
+  }
+  canvas._argusRedraw = ()=>{ try{ draw(activeTipIndex); }catch(err){} };
+  chartRedraws.push(canvas._argusRedraw);
+}
+
+function fmtPm(v){
+  if(v===null || v===undefined || isNaN(v)) return '';
+  return (v>0?'+':'') + v.toFixed(2);
+}
+
+// ================= 长协定价 =================
+let calcState = {index:'m42', laycan:todayStr(7), x:2, premium:0};
+function renderCalc(){
+  const box = document.getElementById('wsbox');
+  box.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:4px">长协定价计算器（4,200 GAR 指数）</div>
+      <div style="margin:10px 0 4px;font-size:13px;color:var(--muted)">指数基准</div>
+      <div class="seg">
+        <button class="${calcState.index==='ici4'?'on':''}" onclick="setCalcIndex('ici4')">ICI-4</button>
+        <button class="${calcState.index==='m42'?'on':''}" onclick="setCalcIndex('m42')">M42</button>
+        <button class="${calcState.index==='avg'?'on':''}" onclick="setCalcIndex('avg')">两者平均</button>
+      </div>
+      <div style="margin:10px 0 4px;font-size:13px;color:var(--muted)">LAYCAN 起始日期（取该日之前最近 X 个周五发布的指数）</div>
+      <input type="date" class="input" id="claycan" value="${calcState.laycan}" onchange="calcState.laycan=this.value">
+      <div style="margin:10px 0 4px;font-size:13px;color:var(--muted)">取 LAYCAN 前几期</div>
+      <select class="input" id="cx" onchange="calcState.x=parseInt(this.value,10)">
+        ${[1,2,3,4].map(n=>'<option value="'+n+'"'+(calcState.x===n?' selected':'')+'>'+n+' 期</option>').join('')}
+      </select>
+      <div style="margin:10px 0 4px;font-size:13px;color:var(--muted)">Premium（美元/吨，可填负数）</div>
+      <input type="number" class="input" id="cprem" step="0.01" value="${calcState.premium}" onchange="calcState.premium=parseFloat(this.value||0)">
+      <button class="btn" style="margin-top:12px" onclick="doCalc()">计算 FOB 实际价</button>
+    </div>
+    <div id="cresult"></div>`;
+}
+function setCalcIndex(v){
+  calcState.index = v;
+  renderCalc();
+}
+async function doCalc(){
+  const box = document.getElementById('cresult');
+  if(!box) return;
+  box.innerHTML = '<div class="card"><span class="spinner"></span> 计算中…</div>';
+  const q = 'index='+calcState.index+'&laycan='+calcState.laycan+'&x='+calcState.x+'&premium='+calcState.premium;
+  const d = await api('/api/calc?'+q);
+  if(!d.ok){ box.innerHTML = '<div class="card">'+d.error+'</div>'; return; }
+  const idxName = d.index==='ici4' ? 'ICI-4' : (d.index==='m42' ? 'M42' : 'ICI-4 与 M42 平均');
+  const rows = d.fridays.map(fd=>{
+    const m42 = d.m42.dates.includes(fd) ? d.m42.values[d.m42.dates.indexOf(fd)].toFixed(2) : '—';
+    const ici = d.ici4.dates.includes(fd) ? d.ici4.values[d.ici4.dates.indexOf(fd)].toFixed(2) : '—';
+    return '<tr><td>'+fd+'</td><td>'+ici+'</td><td>'+m42+'</td></tr>';
+  }).join('');
+  const baseLabel = d.index==='ici4' ? d.ici4_base : (d.index==='m42' ? d.m42_base : d.base_index);
+  box.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:6px">计算结果（LAYCAN ${d.laycan}，前 ${d.x} 期）</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="text-align:left;color:var(--muted)">
+          <th>周五发布日期</th><th>ICI-4 ($/t)</th><th>M42 ($/t)</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:10px;line-height:1.8;font-size:14px">
+        <div>基准：${idxName}</div>
+        <div>指数均价：<b>${(baseLabel===null||baseLabel===undefined)?'—':baseLabel.toFixed(3)}</b> $/t</div>
+        <div>Premium：${fmtPm(d.premium)} $/t</div>
+      </div>
+      <div style="margin-top:12px;padding:12px;border-radius:10px;background:var(--canvasbg);text-align:center">
+        <div style="font-size:13px;color:var(--muted)">该船 FOB 实际价</div>
+        <div style="font-size:30px;font-weight:800;color:var(--link)">${d.fob_price.toFixed(2)} $/t</div>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--muted)">注：ADJUSTMENT 按合同公式另算，不在本计算器内。</div>
+    </div>`;
+}
+
+// ================= 日报 =================
+const KIND_NAMES = {
+  cdi: 'Coal Daily International（国际煤炭日报）',
+  ici: 'Indonesian Coal Index（印尼煤价指数）',
+  mck: 'McCloskey Coal Price Index（煤炭价格指数）',
+};
+let reportState = {date: '', showEn: false, filter: ''};
+
+async function renderReports(){
+  const v = document.getElementById('view');
+  v.innerHTML = '<div class="card"><span class="spinner"></span> 读取日报目录…</div>';
+  const d = await api('/api/reports');
+  const dates = Object.keys(d.reports||{});
+  if(!dates.length){
+    v.innerHTML = '<div class="card muted">D:\\ArgusPublications 里没有找到日报 PDF，'
+      + '确认自动下载是否正常。</div>';
+    return;
+  }
+  if(!reportState.date || !dates.includes(reportState.date)) reportState.date = dates[0];
+  v.innerHTML = `
+    <div class="ranges" id="rdates">
+      ${dates.slice(0,10).map(dt=>
+        '<button class="'+(dt===reportState.date?'on':'')+'" onclick="pickReportDate(\''+dt+'\')">'+dt+'</button>'
+      ).join('')}
+    </div>
+    <div id="rlist"></div>`;
+  renderReportList();
+}
+
+function pickReportDate(dt){
+  reportState.date = dt;
+  document.querySelectorAll('#rdates button').forEach(b=>b.classList.toggle('on',b.textContent===dt));
+  renderReportList();
+}
+
+async function renderReportList(){
+  const box = document.getElementById('rlist');
+  const d = await api('/api/reports');
+  const kinds = d.reports[reportState.date] || [];
+  box.innerHTML = '<div class="card muted">'+reportState.date+' 的日报：</div>'
+    + kinds.map(k=>
+        '<div class="card" style="cursor:pointer" onclick="openReport(\''+reportState.date+'\',\''+k+'\')">'
+        + '<div class="name" style="padding:0">📄 '+(KIND_NAMES[k]||k)+'</div>'
+        + '<div class="muted" style="margin-top:6px">点击查看（自动翻译成中文）</div></div>'
+      ).join('');
+}
+
+let rseg = 'news';
+
+async function openReport(date, kind){
+  const v = document.getElementById('view');
+  v.innerHTML = '<div class="card"><span class="spinner"></span> 提取并翻译中，'
+    + '首次识别需要几分钟（OCR），之后秒开…</div>';
+  const d = await api('/api/report?date='+date+'&kind='+kind);
+  if(!d.ok || (!d.stories || !d.stories.length) && !d.preamble_en){
+    v.innerHTML = '<div class="card">读取失败：'+(d.error||'无内容')+'</div>';
+    return;
+  }
+  v.innerHTML = `
+    <button class="toolbtn" onclick="renderReports()" style="margin-bottom:10px">← 返回日报列表</button>
+    <div class="card">
+      <div class="name" style="padding:0;font-size:15px">📄 ${d.name}</div>
+      <div class="muted" style="margin-top:4px">${date}${d.ocr && d.ocr_engine?(' · 识别：'+(ENGINE_LABEL[d.ocr_engine]||d.ocr_engine)):''}</div>
+    </div>
+    <div class="seg" id="rseg">
+      <button class="${rseg==='news'?'on':''}" data-rseg="news" onclick="setRseg('news')">📰 新闻</button>
+      <button class="${rseg==='prices'?'on':''}" data-rseg="prices" onclick="setRseg('prices')">📊 价格表（原图）</button>
+    </div>
+    <div id="rnews">
+      <div class="card">
+        <div class="report-tools">
+          <input class="input" id="reportFilter" placeholder="筛选新闻标题或正文" value="${esc(reportState.filter)}"
+            oninput="reportState.filter=this.value;filterReportCards(this.value)">
+          <span class="report-count" id="reportCount"></span>
+        </div>
+        <label class="chkrow" style="border:none;padding:2px 0">
+          <input type="checkbox" ${reportState.showEn?'checked':''}
+            onchange="reportState.showEn=this.checked;renderReportContent()">
+          <span>显示英文原文</span>
+        </label>
+      </div>
+      <div class="card" id="readpanel" style="display:none">
+        <div class="readrow"><span class="readlabel">字号</span><div class="readbtns">
+          <button onclick="adjSize(-1)">A−</button><span id="sizeVal"></span><button onclick="adjSize(1)">A+</button></div></div>
+        <div class="readrow"><span class="readlabel">字体</span><div class="readbtns">
+          <button data-f="default" onclick="setReadFam('default')">默认</button>
+          <button data-f="song" onclick="setReadFam('song')">宋体</button>
+          <button data-f="kai" onclick="setReadFam('kai')">楷体</button></div></div>
+        <div class="readrow"><span class="readlabel">行距</span><div class="readbtns">
+          <button data-l="1.4" onclick="setReadLine('1.4')">紧凑</button>
+          <button data-l="1.75" onclick="setReadLine('1.75')">标准</button>
+          <button data-l="2.2" onclick="setReadLine('2.2')">宽松</button></div></div>
+        <div class="readrow"><span class="readlabel">段落</span><div class="readbtns">
+          <button data-p="6" onclick="setReadPara('6')">小</button>
+          <button data-p="10" onclick="setReadPara('10')">中</button>
+          <button data-p="16" onclick="setReadPara('16')">大</button></div></div>
+      </div>
+      <div id="rcontent"></div>
+    </div>
+    <div id="rprices" style="display:none"></div>`;
+  window._reportData = d;
+  document.getElementById('readBtn').style.display='inline-flex';
+  renderReportContent();
+  applyReadSettings();
+  if(rseg==='prices') renderPricePages();
+}
+
+function setRseg(name){
+  rseg = name;
+  const seg = document.getElementById('rseg');
+  if(seg) seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.rseg===name));
+  const news = document.getElementById('rnews');
+  const prices = document.getElementById('rprices');
+  if(news) news.style.display = name==='news' ? '' : 'none';
+  if(prices){
+    prices.style.display = name==='prices' ? '' : 'none';
+    if(name==='prices') renderPricePages();
+  }
+}
+
+async function renderPricePages(){
+  const box = document.getElementById('rprices');
+  const d = window._reportData;
+  if(!box || !d) return;
+  if(box.dataset.loaded) return;
+  box.dataset.loaded = '1';
+  box.innerHTML = '<div class="card"><span class="spinner"></span> 生成价格表原图…</div>';
+  const r = await api('/api/price-pages?date='+d.date+'&kind='+d.kind);
+  if(!r.ok || !r.pages || !r.pages.length){
+    box.innerHTML = '<div class="card muted">这份日报没有检测到独立价格表页。</div>';
+    return;
+  }
+  box.innerHTML = r.pages.map(item=>{
+    const p = item.page;
+    let src = '/api/price-image?date='+d.date+'&kind='+d.kind+'&page='+p;
+    if(item.crop && item.box) src += '&crop=1&box='+item.box.join(',');
+    const label = item.crop
+      ? '第 '+p+' 页 · 价格表局部（点击放大）'
+      : '第 '+p+' 页 · 价格表原图（点击放大）';
+    return '<div class="card">'
+      + '<div class="muted" style="margin-bottom:8px">'+label+'</div>'
+      + '<a href="'+src+'" target="_blank" rel="noopener" style="display:block">'
+      + '<img src="'+src+'" alt="价格表第'+p+'页" loading="lazy" style="width:100%;border:1px solid var(--line);border-radius:8px;display:block"></a>'
+      + '</div>';
+  }).join('');
+}
+
+function renderReportContent(){
+  const box = document.getElementById('rcontent');
+  const d = window._reportData;
+  if(!box || !d) return;
+  if(!(d.stories||[]).length){
+    box.innerHTML = '<div class="card muted">这份日报以价格表为主，'
+      + '请切换到上方「价格表（原图）」查看。</div>';
+    return;
+  }
+  const allStories = d.stories||[];
+  const count = document.getElementById('reportCount');
+  if(count) count.textContent = allStories.length+' 条';
+  let html = '';
+  if(d.preamble_en){
+    html += '<div class="card"><div class="name" style="padding:0">📋 报告概要</div>'
+      + '<div class="preamble-body">'+esc(d.preamble_zh||d.preamble_en)+'</div>'
+      + (reportState.showEn
+          ? '<div class="seb"><p>'+esc(d.preamble_en)+'</p></div>' : '')
+      + '</div>';
+  }
+  html += allStories.map((s, storyIndex)=>{
+    const bodyZh = (s.body_zh||s.body_en||'').split('\n').filter(Boolean)
+      .map(p=>'<p>'+esc(p)+'</p>').join('');
+    const bodyEn = reportState.showEn && (s.body_paras||[])
+      .map(p=>'<p>'+esc(p)+'</p>').join('');
+    const searchText = ((s.headline_zh||'')+' '+(s.headline_en||'')+' '+(s.body_zh||'')+' '+(s.body_en||'')).toLowerCase();
+    return '<div class="card story" data-story-search="'+esc(searchText)+'">'
+      + '<div class="sh"><span class="story-index">'+(storyIndex+1)+'</span>'+(esc(s.headline_zh||s.headline_en))+'</div>'
+      + (s.headline_en && s.headline_zh ? '<div class="seh">'+esc(s.headline_en)+'</div>' : '')
+      + '<div class="sb">'+bodyZh+'</div>'
+      + (bodyEn ? '<div class="seb">'+bodyEn+'</div>' : '')
+      + '</div>';
+  }).join('');
+  box.innerHTML = html || '<div class="card muted">没有匹配的新闻</div>';
+  filterReportCards(reportState.filter);
+}
+
+function filterReportCards(value){
+  const q = (value||'').trim().toLowerCase();
+  const cards = document.querySelectorAll('#rcontent .story');
+  let visible = 0;
+  cards.forEach(card=>{
+    const show = !q || (card.dataset.storySearch||'').includes(q);
+    card.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+  const count = document.getElementById('reportCount');
+  if(count) count.textContent = q ? (visible+'/'+cards.length+' 条') : (cards.length+' 条');
+}
+
+// ================= AI =================
+function renderAI(){
+  const v = document.getElementById('view');
+  v.innerHTML = `
+    <div class="notice">
+      <b>Ask Argus（Argus 官方 AI）</b><br>
+      这是 Argus 自带的 AI 助手，可以问市场问题、查价格、做总结，答案带出处。
+      它集成在 Argus 官方网站和官方手机 App 里，账号登录后即可使用。
+    </div>
+    <div style="height:12px"></div>
+    <div class="card">
+      <button class="btn" onclick="window.open('https://direct.argusmedia.com/','_blank')">打开 Argus 网页版（含 Ask Argus）</button>
+      <div style="height:10px"></div>
+      <button class="btn secondary" onclick="window.open('https://apps.apple.com/cn/app/argus-mobile/id6744147005','_blank')">iPhone 下载官方 Argus App</button>
+      <div style="height:10px"></div>
+      <button class="btn secondary" onclick="window.open('https://play.google.com/store/apps/details?id=com.argusmedia.app','_blank')">Android 下载官方 Argus App</button>
+    </div>
+    <div class="card muted">
+      提示：Ask Argus 目前只有 Argus 官方渠道可用，没有开放第三方接口；
+      官方 App 里可以直接语音/文字问它。
+    </div>`;
+}
+
+applyTheme();
+init();
+</script>
+</body>
+</html>

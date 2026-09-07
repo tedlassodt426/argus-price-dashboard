@@ -1,0 +1,9 @@
+[ARGUS]
+username = your-argus-account@example.com
+password = put-your-argus-password-here
+
+[OCR]
+backend =
+mode = auto
+dpi = 150
+concurrency = 2

@@ -1,0 +1,26 @@
+# 本机账号、密钥和会话状态
+config.ini
+app_password.txt
+app_secret.txt
+*.credential.xml
+news_profile/
+
+# 本地日报数据、OCR结果和运行缓存
+argus_output/
+logs/
+news_cache/
+__pycache__/
+*.py[cod]
+*.log
+
+# Argus PDF/图片不进入源码仓库
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Windows 本地启动脚本；Mac 使用 Python/launchd
+*.bat
+*.ps1
+workspace.json
+tools/*.exe
